@@ -1,22 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\PassController;
-use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PageController;
 
-Route::middleware('api')->group(function () {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+// Ruta de bienvenida (si tienes una página principal)
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/user', [AuthController::class, 'user']);
+// Ejemplo de rutas web para vistas que podrían usarse en Blade
+Route::get('/about', [PageController::class, 'about'])->name('about');
+Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 
-        Route::apiResource('bookings', BookingController::class);
-        Route::apiResource('passes', PassController::class);
-        Route::apiResource('appointments', AppointmentController::class);
-    });
-});
-
+// Si en el futuro necesitas autenticación en la web, lo harías aquí
+// Route::middleware('auth')->group(function () {
+//     Route::get('/dashboard', function () {
+//         return view('dashboard');
+//     })->name('dashboard');
+// });
