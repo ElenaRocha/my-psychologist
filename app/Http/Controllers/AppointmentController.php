@@ -2,47 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return $this->successResponse(Appointment::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show($id)
+    {
+        $appointment = Appointment::find($id);
+        if (!$appointment) {
+            return $this->errorResponse("Cita no encontrada", 404);
+        }
+        return $this->successResponse($appointment);
+    }
+
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'pass_id' => 'required|exists:passes,id',
+            'booking_id' => 'required|exists:bookings,id',
+        ]);
+
+        $appointment = Appointment::create($validated);
+        return $this->successResponse($appointment, "Cita creada correctamente", 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $appointment = Appointment::find($id);
+        if (!$appointment) {
+            return $this->errorResponse("Cita no encontrada", 404);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $appointment->delete();
+        return $this->successResponse(null, "Cita eliminada correctamente", 204);
     }
 }

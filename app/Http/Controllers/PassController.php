@@ -2,47 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pass;
 use Illuminate\Http\Request;
 
 class PassController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return $this->successResponse(Pass::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function show($id)
+    {
+        $pass = Pass::find($id);
+        if (!$pass) {
+            return $this->errorResponse("Bono no encontrado", 404);
+        }
+        return $this->successResponse($pass);
+    }
+
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'total_sessions' => 'required|integer|min:1',
+        ]);
+
+        $pass = Pass::create([
+            'user_id' => $validated['user_id'],
+            'total_sessions' => $validated['total_sessions'],
+            'remaining_sessions' => $validated['total_sessions'],
+            'purchase_date' => now(),
+        ]);
+
+        return $this->successResponse($pass, "Bono creado correctamente", 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $pass = Pass::find($id);
+        if (!$pass) {
+            return $this->errorResponse("Bono no encontrado", 404);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $pass->delete();
+        return $this->successResponse(null, "Bono eliminado correctamente", 204);
     }
 }
